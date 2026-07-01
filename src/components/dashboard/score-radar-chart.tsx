@@ -47,21 +47,26 @@ function OverviewAxisTick({
   cy,
   payload,
 }: {
-  x?: number;
-  y?: number;
-  cx?: number;
-  cy?: number;
+  x?: number | string;
+  y?: number | string;
+  cx?: number | string;
+  cy?: number | string;
   payload?: { value: string };
 }) {
+  const numX = typeof x === "string" ? parseFloat(x) : x;
+  const numY = typeof y === "string" ? parseFloat(y) : y;
+  const numCx = typeof cx === "string" ? parseFloat(cx) : cx;
+  const numCy = typeof cy === "string" ? parseFloat(cy) : cy;
+
   const label = payload?.value ?? "";
-  if (x == null || y == null) return null;
+  if (numX == null || numY == null) return null;
 
   const initial = OVERVIEW_LABEL_INITIAL[label] ?? label.charAt(0);
-  const centerX = cx ?? x;
-  const centerY = cy ?? y;
+  const centerX = numCx ?? numX;
+  const centerY = numCy ?? numY;
   const pull = 0.14;
-  const tx = x + (centerX - x) * pull;
-  const ty = y + (centerY - y) * pull;
+  const tx = numX + (centerX - numX) * pull;
+  const ty = numY + (centerY - numY) * pull;
 
   return (
     <text
