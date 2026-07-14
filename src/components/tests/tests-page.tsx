@@ -22,7 +22,7 @@ import {
 import { TestDrawer } from "./test-drawer";
 import { TableColumnHeader, assessmentColumnHints } from "@/components/shared/table-column-header";
 import { testRuns, getAgentById } from "@/lib/data/mock";
-import type { TestRun, Priority, TestArea } from "@/lib/types";
+import type { TestRun, Priority, TestArea, SystemType } from "@/lib/types";
 import {
   priorityConfig,
   formatRelativeDate,
@@ -32,13 +32,21 @@ import {
   expandTestsByAgent,
   isRecurrentTest,
 } from "@/lib/utils/tests";
+import { getScheduleLabelForTest } from "@/lib/utils/schedules";
+import {
+  systemTypeConfig,
+  systemTypeOrder,
+} from "@/lib/utils/system-types";
+import { SystemTypeLabel } from "@/components/shared/system-type-label";
 import { cn } from "@/lib/utils";
 
 const ALL_PRIORITIES = "all" as const;
 const ALL_AREAS = "all" as const;
+const ALL_SYSTEM_TYPES = "all" as const;
 
 type PriorityFilter = Priority | typeof ALL_PRIORITIES;
 type AreaFilter = TestArea | typeof ALL_AREAS;
+type SystemTypeFilter = SystemType | typeof ALL_SYSTEM_TYPES;
 
 const priorityFilters: { value: PriorityFilter; label: string }[] = [
   { value: "all", label: "All" },
@@ -52,6 +60,14 @@ const areaFilters: { value: AreaFilter; label: string }[] = [
   { value: "security", label: "Security" },
   { value: "compliance", label: "Compliance" },
   { value: "efficiency", label: "Efficiency" },
+];
+
+const systemTypeFilters: { value: SystemTypeFilter; label: string }[] = [
+  { value: "all", label: "All system type" },
+  ...systemTypeOrder.map((value) => ({
+    value,
+    label: systemTypeConfig[value].label,
+  })),
 ];
 
 function PriorityTab({
@@ -120,11 +136,13 @@ function AgentCell({ agentId }: { agentId: string }) {
 }
 
 function RecurrenceCell({ test }: { test: TestRun }) {
-  if (isRecurrentTest(test)) {
+  const scheduleLabel = getScheduleLabelForTest(test.scheduleId);
+
+  if (isRecurrentTest(test) && scheduleLabel) {
     return (
       <div>
         <p className="text-[13px] font-medium text-foreground">Recurrent</p>
-        <p className="text-[12px] text-muted-foreground">{test.schedule}</p>
+        <p className="text-[12px] text-muted-foreground">{scheduleLabel}</p>
       </div>
     );
   }
@@ -155,6 +173,9 @@ function TestRow({
         <span className="text-[14px] font-medium text-foreground">
           {test.testCase}
         </span>
+      </TableCell>
+      <TableCell>
+        <SystemTypeLabel systemType={test.systemType} plain />
       </TableCell>
       <TableCell>
         <AreaScore test={test} />
@@ -211,7 +232,7 @@ function PrioritySectionHeader({
 
   return (
     <TableRow className="border-border bg-muted/25 hover:bg-muted/25">
-      <TableCell colSpan={6} className="py-3">
+      <TableCell colSpan={7} className="py-3">
         <div className="flex items-center gap-2.5">
           <span className={cn("size-1.5 rounded-full", config.dot)} />
           <span className="text-[13px] font-semibold text-foreground">
@@ -234,19 +255,28 @@ export function TestsPageContent() {
     (searchParams.get("priority") as Priority | null) ?? ALL_PRIORITIES;
   const initialArea =
     (searchParams.get("area") as TestArea | null) ?? ALL_AREAS;
+  const initialSystemType =
+    (searchParams.get("systemType") as SystemType | null) ?? ALL_SYSTEM_TYPES;
 
   const [search, setSearch] = useState("");
   const [priorityFilter, setPriorityFilter] =
     useState<PriorityFilter>(initialPriority);
   const [areaFilter, setAreaFilter] = useState<AreaFilter>(initialArea);
+  const [systemTypeFilter, setSystemTypeFilter] =
+    useState<SystemTypeFilter>(initialSystemType);
   const [selectedTest, setSelectedTest] = useState<TestRun | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const updateFilters = useCallback(
-    (priority: PriorityFilter, area: AreaFilter) => {
+    (
+      priority: PriorityFilter,
+      area: AreaFilter,
+      systemType: SystemTypeFilter
+    ) => {
       const params = new URLSearchParams();
       if (priority !== ALL_PRIORITIES) params.set("priority", priority);
       if (area !== ALL_AREAS) params.set("area", area);
+      if (systemType !== ALL_SYSTEM_TYPES) params.set("systemType", systemType);
       const qs = params.toString();
       router.replace(qs ? `/tests?${qs}` : "/tests", { scroll: false });
     },
@@ -255,17 +285,28 @@ export function TestsPageContent() {
 
   const handlePriorityChange = (value: PriorityFilter) => {
     setPriorityFilter(value);
-    updateFilters(value, areaFilter);
+    updateFilters(value, areaFilter, systemTypeFilter);
   };
 
   const handleAreaChange = (value: AreaFilter) => {
     setAreaFilter(value);
-    updateFilters(priorityFilter, value);
+    updateFilters(priorityFilter, value, systemTypeFilter);
+  };
+
+  const handleSystemTypeChange = (value: SystemTypeFilter) => {
+    setSystemTypeFilter(value);
+    updateFilters(priorityFilter, areaFilter, value);
   };
 
   const baseRows = useMemo(() => {
     const filtered = testRuns.filter((t) => {
       if (areaFilter !== ALL_AREAS && t.area !== areaFilter) return false;
+      if (
+        systemTypeFilter !== ALL_SYSTEM_TYPES &&
+        t.systemType !== systemTypeFilter
+      ) {
+        return false;
+      }
       return true;
     });
 
@@ -281,7 +322,7 @@ export function TestsPageContent() {
         agent?.name.toLowerCase().includes(q)
       );
     });
-  }, [search, areaFilter]);
+  }, [search, areaFilter, systemTypeFilter]);
 
   const priorityCounts = useMemo(() => {
     const counts: Record<PriorityFilter, number> = {
@@ -320,7 +361,7 @@ export function TestsPageContent() {
       <div className="flex items-center justify-between gap-4">
         <h1 className="page-title">Assessments</h1>
         <Button className="create-new-btn">
-          Crea nuovo
+          Create new
           <Plus className="size-4" />
         </Button>
       </div>
@@ -346,47 +387,68 @@ export function TestsPageContent() {
                 label={f.label}
                 count={priorityCounts[f.value]}
                 activeClassName={
-                  f.value === "critical"
-                    ? "bg-red-500/10 text-red-300"
-                    : f.value === "medium"
-                      ? "bg-amber-500/10 text-amber-200"
-                      : f.value === "low"
-                        ? "bg-accent text-foreground"
-                        : undefined
+                  f.value === "all"
+                    ? undefined
+                    : priorityConfig[f.value].tabClassName
                 }
               />
             ))}
           </div>
 
-          <Select
-            value={areaFilter}
-            onValueChange={(v) => handleAreaChange((v ?? ALL_AREAS) as AreaFilter)}
-          >
-            <SelectTrigger className="w-[188px] border-border bg-card">
-              <span className="truncate text-sm">
-                {areaFilters.find((f) => f.value === areaFilter)?.label}
-              </span>
-            </SelectTrigger>
-            <SelectContent>
-              {areaFilters.map((f) => (
-                <SelectItem key={f.value} value={f.value}>
-                  <span className="flex items-center gap-2">
-                    {f.value !== ALL_AREAS && (
-                      <span
-                        className={cn(
-                          "size-2 rounded-full",
-                          f.value === "security" && "bg-violet-400",
-                          f.value === "compliance" && "bg-blue-400",
-                          f.value === "efficiency" && "bg-pink-400"
-                        )}
-                      />
-                    )}
+          <div className="flex flex-wrap items-center gap-3">
+            <Select
+              value={systemTypeFilter}
+              onValueChange={(v) =>
+                handleSystemTypeChange((v ?? ALL_SYSTEM_TYPES) as SystemTypeFilter)
+              }
+            >
+              <SelectTrigger className="w-[188px] border-border bg-card">
+                <span className="truncate text-sm">
+                  {
+                    systemTypeFilters.find((f) => f.value === systemTypeFilter)
+                      ?.label
+                  }
+                </span>
+              </SelectTrigger>
+              <SelectContent>
+                {systemTypeFilters.map((f) => (
+                  <SelectItem key={f.value} value={f.value}>
                     {f.label}
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={areaFilter}
+              onValueChange={(v) => handleAreaChange((v ?? ALL_AREAS) as AreaFilter)}
+            >
+              <SelectTrigger className="w-[188px] border-border bg-card">
+                <span className="truncate text-sm">
+                  {areaFilters.find((f) => f.value === areaFilter)?.label}
+                </span>
+              </SelectTrigger>
+              <SelectContent>
+                {areaFilters.map((f) => (
+                  <SelectItem key={f.value} value={f.value}>
+                    <span className="flex items-center gap-2">
+                      {f.value !== ALL_AREAS && (
+                        <span
+                          className={cn(
+                            "size-2 rounded-full",
+                            f.value === "security" && "bg-violet-400",
+                            f.value === "compliance" && "bg-blue-400",
+                            f.value === "efficiency" && "bg-pink-400"
+                          )}
+                        />
+                      )}
+                      {f.label}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
@@ -407,6 +469,12 @@ export function TestsPageContent() {
                 </TableHead>
                 <TableHead>
                   <TableColumnHeader label="Test case" hint={assessmentColumnHints.testCase} />
+                </TableHead>
+                <TableHead>
+                  <TableColumnHeader
+                    label="System type"
+                    hint={assessmentColumnHints.systemType}
+                  />
                 </TableHead>
                 <TableHead>
                   <TableColumnHeader label="Test area" hint={assessmentColumnHints.testArea} />

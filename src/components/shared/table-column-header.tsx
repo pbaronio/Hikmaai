@@ -14,6 +14,8 @@ export const assessmentColumnHints = {
     "The name of the security, compliance, or efficiency test that was executed.",
   testArea:
     "Which assessment domain this test belongs to: Security, Compliance, or Efficiency.",
+  systemType:
+    "The framework or scope this assessment belongs to, such as Security, EU AI Act, MCP Security, or Skills.",
   recurrence:
     "Whether this assessment runs on a schedule or was executed as a one-off.",
   lastChecked: "When this assessment was last run against the asset.",
@@ -25,6 +27,15 @@ export const evaluationColumnHints = {
     "The industry or domain this evaluation is designed for, e.g. Fine Tech or FinTech.",
   preset:
     "The built-in test preset this evaluation is based on: Safety basics, OWASP LLM01/LLM02, or a custom configuration.",
+} as const;
+
+export const scheduleColumnHints = {
+  name: "The name of this recurring schedule.",
+  details: "When and how often tests on this schedule run.",
+  testsUsingSchedule:
+    "How many tests are configured to run on this schedule.",
+  status:
+    "Active when at least one test uses this schedule; inactive when none do.",
 } as const;
 
 interface TableColumnHeaderProps {

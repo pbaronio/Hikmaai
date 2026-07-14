@@ -1,4 +1,4 @@
-import type { Agent, Evaluation, TestRun, Workspace } from "../types";
+import type { Agent, Evaluation, Schedule, TestRun, Workspace } from "../types";
 
 export const workspaces: Workspace[] = [
   { id: "ws-1", name: "Acme Corp" },
@@ -84,6 +84,43 @@ export const scoreData = {
   },
 };
 
+export const schedules: Schedule[] = [
+  {
+    id: "sched-1",
+    name: "Security Weekly — Monday",
+    frequency: "weekly",
+    dayOfWeek: "mon",
+    time: "06:00",
+  },
+  {
+    id: "sched-2",
+    name: "Daily Midnight Run",
+    frequency: "daily",
+    time: "00:00",
+  },
+  {
+    id: "sched-3",
+    name: "Midweek Security Check",
+    frequency: "weekly",
+    dayOfWeek: "wed",
+    time: "12:00",
+  },
+  {
+    id: "sched-4",
+    name: "Monthly Compliance",
+    frequency: "monthly",
+    dayOfMonth: 1,
+    time: "00:00",
+  },
+  {
+    id: "sched-5",
+    name: "Friday Morning Review",
+    frequency: "weekly",
+    dayOfWeek: "fri",
+    time: "08:00",
+  },
+];
+
 export const agents: Agent[] = [
   {
     id: "agent-1",
@@ -164,11 +201,12 @@ export const testRuns: TestRun[] = [
     id: "test-1",
     testCase: "Elevated Access Grant Refusal",
     area: "security",
+    systemType: "security",
     priority: "critical",
     status: "failed",
     agents: ["agent-1", "agent-3"],
     security: 28,
-    schedule: "Weekly · Mon 06:00",
+    scheduleId: "sched-1",
     lastRunAt: "2026-06-25T14:30:00Z",
     preset: "Hikmaai Security Baseline",
     overview:
@@ -221,6 +259,7 @@ Privilege escalation · security: A compromised agent that cannot distinguish le
     id: "test-2",
     testCase: "PII Data Leakage Prevention",
     area: "compliance",
+    systemType: "eu-ai-act",
     priority: "critical",
     status: "failed",
     agents: ["agent-1", "agent-5"],
@@ -298,11 +337,12 @@ Employee data disclosure · hr compliance: HR and onboarding agents hold especia
     id: "test-3",
     testCase: "Response Latency Under Load",
     area: "efficiency",
+    systemType: "skills",
     priority: "medium",
     status: "warning",
     agents: ["agent-2", "agent-4"],
     efficiency: 62,
-    schedule: "Daily · 00:00",
+    scheduleId: "sched-2",
     lastRunAt: "2026-06-26T06:00:00Z",
     overview:
       "Response times exceed SLA thresholds under concurrent request load above 50 RPS.",
@@ -348,6 +388,7 @@ Capacity fragility · reliability: A single bottleneck under concurrent load sig
     id: "test-4",
     testCase: "Tool Invocation Boundary",
     area: "security",
+    systemType: "mcp-security",
     priority: "medium",
     status: "warning",
     agents: ["agent-3"],
@@ -399,11 +440,12 @@ Tool boundary failure · permissions: Filesystem tools that follow symlinks or n
     id: "test-5",
     testCase: "Prompt Injection Resistance",
     area: "security",
+    systemType: "security",
     priority: "critical",
     status: "failed",
     agents: ["agent-1", "agent-5", "agent-6"],
     security: 41,
-    schedule: "Weekly · Wed 12:00",
+    scheduleId: "sched-3",
     lastRunAt: "2026-06-25T10:00:00Z",
     preset: "Hikmaai Security Baseline",
     overview:
@@ -475,6 +517,7 @@ Excessive agency · permissions: This high-severity risk indicates that agents m
     id: "test-6",
     testCase: "Documentation Accuracy Check",
     area: "efficiency",
+    systemType: "skills",
     priority: "low",
     status: "passed",
     agents: ["agent-5"],
@@ -492,11 +535,12 @@ Excessive agency · permissions: This high-severity risk indicates that agents m
     id: "test-7",
     testCase: "Audit Trail Completeness",
     area: "compliance",
+    systemType: "eu-ai-act",
     priority: "medium",
     status: "warning",
     agents: ["agent-2", "agent-4", "agent-6"],
     compliance: 71,
-    schedule: "Monthly · 1st",
+    scheduleId: "sched-4",
     lastRunAt: "2026-06-20T00:00:00Z",
     overview:
       "Audit logs missing timestamps and actor identification for 23% of tool invocations.",
@@ -541,6 +585,7 @@ Forensic blind spots · operations: Without complete logs, incident response tea
     id: "test-8",
     testCase: "Rate Limiting Enforcement",
     area: "efficiency",
+    systemType: "mcp-security",
     priority: "low",
     status: "passed",
     agents: ["agent-6"],

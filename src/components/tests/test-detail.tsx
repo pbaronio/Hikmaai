@@ -19,6 +19,7 @@ import {
   formatDate,
 } from "@/lib/utils/format";
 import { getAgentNames } from "@/lib/data/mock";
+import { getScheduleLabelForTest } from "@/lib/utils/schedules";
 
 interface TestDetailContentProps {
   test: TestRun;
@@ -228,10 +229,10 @@ export function TestDetailContent({ test }: TestDetailContentProps) {
                 <p>{test.preset}</p>
               </div>
             )}
-            {test.schedule && (
+            {test.scheduleId && (
               <div>
                 <span className="text-muted-foreground">Schedule</span>
-                <p>{test.schedule}</p>
+                <p>{getScheduleLabelForTest(test.scheduleId)}</p>
               </div>
             )}
           </div>

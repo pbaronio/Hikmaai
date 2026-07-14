@@ -74,7 +74,7 @@ function OverviewAxisTick({
       y={ty}
       textAnchor="middle"
       dominantBaseline="middle"
-      fill="#ffffff"
+      fill="var(--foreground)"
       fontSize={12}
       fontWeight={500}
     >
@@ -91,7 +91,7 @@ function OverviewRadarVisual({
   return (
     <ChartContainer
       config={chartConfig}
-      className="aspect-square h-[200px] w-[200px] overflow-visible [&_.recharts-responsive-container]:overflow-visible [&_.recharts-surface]:overflow-visible [&_.recharts-wrapper]:overflow-visible"
+      className="aspect-square h-[200px] w-[200px] overflow-visible text-foreground [&_.recharts-polar-angle-axis-tick_text]:fill-foreground [&_.recharts-responsive-container]:overflow-visible [&_.recharts-surface]:overflow-visible [&_.recharts-wrapper]:overflow-visible"
     >
       <RadarChart
         cx="50%"
@@ -102,7 +102,7 @@ function OverviewRadarVisual({
       >
         <PolarGrid
           gridType="polygon"
-          stroke="rgba(255,255,255,0.12)"
+          stroke="var(--border)"
           radialLines
         />
         <PolarAngleAxis
@@ -162,16 +162,12 @@ function RadarVisual({
   tickFontSize?: number;
 }) {
   return (
-    <ChartContainer config={chartConfig} className={cn("aspect-square", className)}>
+    <ChartContainer config={chartConfig} className={cn("aspect-square text-foreground [&_.recharts-polar-angle-axis-tick_text]:fill-foreground", className)}>
       <RadarChart cx="50%" cy="50%" outerRadius="72%" data={data}>
-        <PolarGrid
-          gridType="polygon"
-          stroke="rgba(255,255,255,0.1)"
-          radialLines
-        />
+        <PolarGrid gridType="polygon" stroke="var(--border)" radialLines />
         <PolarAngleAxis
           dataKey="area"
-          tick={{ fill: "#a1a1aa", fontSize: tickFontSize, fontWeight: 400 }}
+          tick={{ fill: "var(--foreground)", fontSize: tickFontSize, fontWeight: 400 }}
           tickLine={false}
         />
         <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
@@ -230,7 +226,7 @@ function OverviewLegend({
               className="size-2 shrink-0 rounded-[4px]"
               style={{ backgroundColor: areaConfig[key].chartColor }}
             />
-            <span className="text-[11px] font-medium leading-[19.5px] text-muted-foreground">
+            <span className="text-[11px] font-medium leading-[19.5px] text-foreground">
               {areaConfig[key].label}
             </span>
           </div>

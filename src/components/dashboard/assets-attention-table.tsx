@@ -8,28 +8,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getAssetsNeedingAttention } from "@/lib/data/mock";
-import { formatRelativeDate } from "@/lib/utils/format";
+import { formatRelativeDate, agentStatusConfig, neutralChipClassName } from "@/lib/utils/format";
 import type { TestArea } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 const typeLabels = {
   agent: "Agent",
   mcp: "MCP",
   skill: "Skill",
-};
-
-const statusConfig = {
-  active: {
-    label: "Active",
-    className: "border-emerald-500/20 bg-emerald-500/10 text-emerald-300",
-  },
-  inactive: {
-    label: "Inactive",
-    className: "border-border bg-muted text-muted-foreground",
-  },
-  degraded: {
-    label: "Degraded",
-    className: "border-red-500/20 bg-red-500/10 text-red-300",
-  },
 };
 
 function weakestArea(agent: {
@@ -112,7 +98,7 @@ export function AssetsAttentionTable() {
                   </Link>
                 </TableCell>
                 <TableCell>
-                  <span className="rounded-md border border-border bg-muted px-2 py-0.5 text-[12px] text-muted-foreground">
+                  <span className={cn("rounded-md border px-2 py-0.5 text-[12px] font-medium", neutralChipClassName)}>
                     {typeLabels[agent.type]}
                   </span>
                 </TableCell>
@@ -128,9 +114,12 @@ export function AssetsAttentionTable() {
                 </TableCell>
                 <TableCell>
                   <span
-                    className={`rounded-md px-2 py-0.5 text-[11px] font-medium ${statusConfig[agent.status].className}`}
+                    className={cn(
+                      "rounded-md border px-2 py-0.5 text-[11px] font-medium",
+                      agentStatusConfig[agent.status].className
+                    )}
                   >
-                    {statusConfig[agent.status].label}
+                    {agentStatusConfig[agent.status].label}
                   </span>
                 </TableCell>
                 <TableCell className="text-[13px] text-muted-foreground">

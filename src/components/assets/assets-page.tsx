@@ -21,19 +21,13 @@ import {
 import { AssetDrawer } from "./asset-drawer";
 import { agents } from "@/lib/data/mock";
 import type { Agent } from "@/lib/types";
-import { formatRelativeDate, getScoreColor } from "@/lib/utils/format";
+import { formatRelativeDate, getScoreColor, agentStatusConfig, neutralChipClassName } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 const typeLabels = {
   agent: "AI Agent",
   mcp: "MCP",
   skill: "Skill",
-};
-
-const statusConfig = {
-  active: { label: "Active", className: "border-emerald-500/20 bg-emerald-500/10 text-emerald-300" },
-  inactive: { label: "Inactive", className: "border-border bg-muted text-muted-foreground" },
-  degraded: { label: "Degraded", className: "border-amber-500/20 bg-amber-500/10 text-amber-200" },
 };
 
 type SortKey =
@@ -92,7 +86,7 @@ function SortableTableHead({
 }
 
 const typeFilterLabels: Record<string, string> = {
-  all: "Tutte le tipologie",
+  all: "All types",
   agent: "Agents",
   mcp: "MCP",
   skill: "Skills",
@@ -176,7 +170,7 @@ export function AssetsPageContent() {
         <div className="flex items-center justify-between gap-4">
           <h1 className="page-title">Assets</h1>
           <Button className="create-new-btn shrink-0">
-            Crea nuovo
+            Create new
             <Plus className="size-4" />
           </Button>
         </div>
@@ -205,7 +199,7 @@ export function AssetsPageContent() {
             </span>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tutte le tipologie</SelectItem>
+            <SelectItem value="all">All types</SelectItem>
             <SelectItem value="agent">Agents</SelectItem>
             <SelectItem value="mcp">MCP</SelectItem>
             <SelectItem value="skill">Skills</SelectItem>
@@ -294,7 +288,7 @@ export function AssetsPageContent() {
                   {agent.name}
                 </TableCell>
                 <TableCell>
-                  <span className="rounded-md border border-border bg-muted px-2 py-0.5 text-[12px] text-muted-foreground">
+                  <span className={cn("rounded-md border px-2 py-0.5 text-[12px] font-medium", neutralChipClassName)}>
                     {typeLabels[agent.type]}
                   </span>
                 </TableCell>
@@ -314,8 +308,8 @@ export function AssetsPageContent() {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <span className={`rounded-md px-2 py-0.5 text-[11px] font-medium ${statusConfig[agent.status].className}`}>
-                    {statusConfig[agent.status].label}
+                  <span className={cn("rounded-md border px-2 py-0.5 text-[11px] font-medium", agentStatusConfig[agent.status].className)}>
+                    {agentStatusConfig[agent.status].label}
                   </span>
                 </TableCell>
                 <TableCell className="text-[13px] font-medium tabular-nums text-foreground">

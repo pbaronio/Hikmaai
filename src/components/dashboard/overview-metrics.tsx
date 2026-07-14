@@ -49,22 +49,21 @@ function AgentStatusCard() {
     <article className="surface-card relative flex min-h-[295px] flex-col overflow-hidden rounded-xl p-6">
       <AgentStatusGraphic />
       <div className="relative z-10 flex flex-1 flex-col">
-        <p className="stat-label">Stato dei tuoi agenti</p>
+        <p className="stat-label">Agent status</p>
         <p className="mt-1.5 text-[32px] font-semibold tracking-tight text-foreground">
           {status}
         </p>
         <p className="mt-1.5 max-w-[265px] text-[13px] leading-snug text-muted-foreground">
-          Risolvi le problematiche emerse dai test critici per migliorare il tuo
-          score
+          Resolve issues from critical tests to improve your score
         </p>
       </div>
       <div className="relative z-10 mt-auto border-t border-white/6 pt-5">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-semibold text-foreground">Hikmaai Score</p>
+          <p className="text-sm font-semibold text-foreground">Hikmaai Score</p>
           <ScoreOutOf100
             value={percentage}
             uniform
-            className="text-[11.5px] font-normal text-[#ffffff]"
+            className="text-sm font-medium text-foreground"
           />
         </div>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
@@ -82,11 +81,11 @@ function TestAreaOverviewCard() {
   const { areas } = scoreData;
 
   return (
-    <article className="relative flex h-[295px] w-full flex-col overflow-visible rounded-xl border border-white/8 bg-card px-[23px] py-[21px]">
+    <article className="relative flex h-[295px] w-full flex-col overflow-visible rounded-xl border border-border bg-card px-[23px] py-[21px] dark:border-white/8">
       <Tooltip>
         <TooltipTrigger
           aria-label="How area scores are calculated"
-          className="absolute right-[23px] top-4 flex size-[18px] cursor-help items-center justify-center rounded-[9px] border border-white/20 text-[10.4px] font-semibold leading-[10.4px] text-white/35 transition-colors hover:border-white/40 hover:text-white/70"
+          className="absolute right-[23px] top-4 flex size-[18px] cursor-help items-center justify-center rounded-[9px] border border-border text-[10.4px] font-semibold leading-[10.4px] text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground dark:border-white/20 dark:text-white/35 dark:hover:border-white/40 dark:hover:text-white/70"
         >
           i
         </TooltipTrigger>

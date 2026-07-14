@@ -40,7 +40,7 @@ export function expandTestsByAgent(tests: TestRun[]): TestRun[] {
 }
 
 export function isRecurrentTest(test: TestRun): boolean {
-  return Boolean(test.schedule);
+  return Boolean(test.scheduleId);
 }
 
 /** Radar axes for a test row: tested area uses run score; others use agent baseline. */

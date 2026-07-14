@@ -13,7 +13,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon-sm"
       onClick={toggleTheme}
-      aria-label={theme === "dark" ? "Passa a light mode" : "Passa a dark mode"}
+      aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
       className="text-muted-foreground hover:text-foreground"
     >
       {theme === "dark" ? (

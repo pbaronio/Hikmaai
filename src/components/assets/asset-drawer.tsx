@@ -14,10 +14,10 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ScoreInfographic } from "@/components/shared/score-infographic";
+import { AssociatedTestRow } from "@/components/shared/associated-test-card";
 import type { Agent } from "@/lib/types";
-import { formatRelativeDate } from "@/lib/utils/format";
 import { getTestsForAgent } from "@/lib/data/mock";
-import { priorityConfig, statusConfig } from "@/lib/utils/format";
+import { formatRelativeDate, agentStatusConfig, neutralChipClassName } from "@/lib/utils/format";
 
 interface AssetDrawerProps {
   agent: Agent | null;
@@ -31,12 +31,6 @@ const typeLabels = {
   skill: "Skill",
 };
 
-const statusLabels = {
-  active: { label: "Active", className: "bg-emerald-500/15 text-emerald-400" },
-  inactive: { label: "Inactive", className: "bg-muted text-muted-foreground" },
-  degraded: { label: "Degraded", className: "bg-amber-500/15 text-amber-400" },
-};
-
 export function AssetDrawer({ agent, open, onOpenChange }: AssetDrawerProps) {
   if (!agent) return null;
 
@@ -45,21 +39,35 @@ export function AssetDrawer({ agent, open, onOpenChange }: AssetDrawerProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full gap-0 overflow-y-auto p-0 sm:!max-w-[768px]">
-        <SheetHeader>
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline">{typeLabels[agent.type]}</Badge>
-            <Badge variant="outline" className={statusLabels[agent.status].className}>
-              {statusLabels[agent.status].label}
+        <SheetHeader className="border-b border-border px-6 py-5">
+          <SheetTitle className="pr-8 text-left text-xl font-semibold leading-snug">
+            {agent.name}
+          </SheetTitle>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <Badge variant="outline" className={neutralChipClassName}>
+              {typeLabels[agent.type]}
+            </Badge>
+            <Badge
+              variant="outline"
+              className={agentStatusConfig[agent.status].className}
+            >
+              {agentStatusConfig[agent.status].label}
             </Badge>
           </div>
-          <SheetTitle className="text-left">{agent.name}</SheetTitle>
-          <SheetDescription className="text-left">
+          <SheetDescription className="mt-2 text-left text-[13px] leading-relaxed">
             Last tested {formatRelativeDate(agent.lastTestedAt)}
+            {activeTests.length > 0 &&
+              ` · ${activeTests.length} active test${activeTests.length === 1 ? "" : "s"}`}
           </SheetDescription>
         </SheetHeader>
 
-        <div className="space-y-6 px-4">
-          <p className="text-sm text-muted-foreground">{agent.description}</p>
+        <div className="space-y-8 px-6 py-6">
+          <section>
+            <p className="section-title">About</p>
+            <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
+              {agent.description}
+            </p>
+          </section>
 
           <ScoreInfographic
             efficiency={agent.efficiency}
@@ -69,37 +77,16 @@ export function AssetDrawer({ agent, open, onOpenChange }: AssetDrawerProps) {
             open={open}
           />
 
-          <div>
-            <h4 className="mb-3 text-sm font-medium">
+          <section>
+            <h4 className="section-title">
               Active tests ({activeTests.length})
             </h4>
-            <div className="space-y-2">
+            <div className="mt-3 space-y-2">
               {activeTests.map((test) => (
-                <div
-                  key={test.id}
-                  className="flex items-center justify-between rounded-lg border border-border bg-muted/30 px-3 py-2"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-medium">{test.testCase}</p>
-                    <div className="mt-0.5 flex gap-1.5">
-                      <Badge
-                        variant="outline"
-                        className={`text-xs ${priorityConfig[test.priority].className}`}
-                      >
-                        {test.priority}
-                      </Badge>
-                      <Badge
-                        variant="outline"
-                        className={`text-xs ${statusConfig[test.status].className}`}
-                      >
-                        {statusConfig[test.status].label}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
+                <AssociatedTestRow key={test.id} test={test} />
               ))}
             </div>
-          </div>
+          </section>
         </div>
 
         <SheetFooter className="flex-col items-center gap-3 border-t border-border bg-card px-6 py-5">

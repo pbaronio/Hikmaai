@@ -23,6 +23,7 @@ import {
   TableColumnHeader,
   evaluationColumnHints,
 } from "@/components/shared/table-column-header";
+import { neutralChipClassName } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 const ALL_CATEGORIES = "all";
@@ -56,7 +57,7 @@ export function EvaluationPageContent() {
       <div className="flex items-center justify-between gap-4">
         <h1 className="page-title">Evaluation</h1>
         <Button className="create-new-btn shrink-0">
-          Crea nuovo
+          Create new
           <Plus className="size-4" />
         </Button>
       </div>
@@ -136,8 +137,8 @@ export function EvaluationPageContent() {
                   <TableCell>
                     <span
                       className={cn(
-                        "inline-flex rounded-md border border-border bg-muted px-2.5 py-0.5",
-                        "text-[12px] font-medium text-muted-foreground"
+                        "inline-flex rounded-md border px-2.5 py-0.5 text-[12px] font-medium",
+                        neutralChipClassName
                       )}
                     >
                       {item.category}

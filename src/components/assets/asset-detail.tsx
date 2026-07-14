@@ -5,8 +5,9 @@ import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScoreInfographic } from "@/components/shared/score-infographic";
+import { AssociatedTestCard } from "@/components/shared/associated-test-card";
 import type { Agent } from "@/lib/types";
-import { formatDate, priorityConfig, statusConfig as testStatusConfig } from "@/lib/utils/format";
+import { formatDate, agentStatusConfig } from "@/lib/utils/format";
 import { getTestsForAgent } from "@/lib/data/mock";
 
 interface AssetDetailContentProps {
@@ -17,12 +18,6 @@ const typeLabels = {
   agent: "AI Agent",
   mcp: "MCP Server",
   skill: "Skill",
-};
-
-const agentStatusConfig = {
-  active: { label: "Active", className: "bg-emerald-500/15 text-emerald-400" },
-  inactive: { label: "Inactive", className: "bg-muted text-muted-foreground" },
-  degraded: { label: "Degraded", className: "bg-amber-500/15 text-amber-400" },
 };
 
 export function AssetDetailContent({ agent }: AssetDetailContentProps) {
@@ -66,32 +61,7 @@ export function AssetDetailContent({ agent }: AssetDetailContentProps) {
         <h2 className="mb-4 text-lg font-medium">Associated tests</h2>
         <div className="space-y-3">
           {tests.map((test) => (
-            <Link key={test.id} href={`/tests/${test.id}`}>
-              <Card className="row-surface transition-colors hover:bg-accent/40">
-                <CardContent className="flex items-center justify-between p-4">
-                  <div>
-                    <p className="font-medium">{test.testCase}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Last run {formatDate(test.lastRunAt)}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Badge
-                      variant="outline"
-                      className={priorityConfig[test.priority].className}
-                    >
-                      {test.priority}
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className={testStatusConfig[test.status].className}
-                    >
-                      {testStatusConfig[test.status].label}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+            <AssociatedTestCard key={test.id} test={test} />
           ))}
         </div>
       </div>
